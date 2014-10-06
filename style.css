@@ -1,0 +1,59 @@
+/* Speak Friend and Enter style sheet */
+
+body {
+	background-color: #b7d1c4;
+}
+
+h1{
+	color: #5c5961;
+	font-family: Verdana;
+	font-weight: bold;
+	text-align: center;
+}
+
+h2 {
+	color: #5c5961;
+	font-family: Verdana;
+	text-align: center;
+}
+
+.matting {
+	margin-right: auto;
+	margin-left: auto;
+	width: 60%;
+	background-color: #d1bab7;
+
+}
+
+.chat-container{
+	text-align: center;
+	padding-left: 15px;
+	padding-right: 15px;
+	padding-bottom: 15px;
+	margin-left: auto;
+	margin-right: auto;
+	box-shadow: 10px 10px 5px #888888;
+
+}
+
+#msgDescription{
+	padding-top: 10px;
+	font-size: 20px;
+}
+
+#messages {
+	text-align: left;
+	background-color: #d1c7b7;
+	color: #5c5961;
+	margin-top: 5px;
+	border: 2px solid #5c5961;
+	border-radius: 5px;
+	height: 300px;
+	overflow: auto;
+}
+
+#m {
+	margin-left: auto;
+	margin-right: auto;
+	width: 85%;
+}

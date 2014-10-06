@@ -1,6 +1,5 @@
 var express = require('express');
 var app = express();
-var fs = require('fs');
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
@@ -9,6 +8,7 @@ app.get('/', function(req, res){
 });
 
 app.use("/script.js", express.static(__dirname + '/script.js'));
+app.use("/stylesheet.css", express.static(__dirname + '/stylesheet.css'));
 app.use("/style.css", express.static(__dirname + '/style.css'));
 
 io.on('connection', function(socket){
