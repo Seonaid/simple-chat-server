@@ -50,7 +50,11 @@ h2 {
 	border-radius: 5px;
 	height: 300px;
 	overflow: auto;
+
 }
+#messages { list-style-type: none; margin: 0; padding: 0; }
+#messages li { padding: 5px 10px; }
+#messages li:nth-child(odd) { background: #eee; }
 
 #m {
 	margin-left: auto;
