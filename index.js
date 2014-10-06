@@ -1,10 +1,15 @@
-var app = require('express')();
+var express = require('express');
+var app = express();
+var fs = require('fs');
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
 });
+
+app.use("/script.js", express.static(__dirname + '/script.js'));
+app.use("/style.css", express.static(__dirname + '/style.css'));
 
 io.on('connection', function(socket){
 	console.log('a user connected');
