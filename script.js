@@ -18,11 +18,50 @@ function changeUser (nickName) {
 
 var socket = io();
 $('form').submit(function(){
-	socket.emit('chat message', userName + ': ' + $('#m').val());
-	$('#m').val('');
-	return false;
+	var purple = $('#m').val();
+	if (validateMessage(purple)){
+		socket.emit('chat message', userName + ': ' + $('#m').val());
+		$('#m').val('');
+		return false;
+	} else{
+		$('#m').val('');
+		return false;
+	}
+	
 });
 socket.on('chat message', function(msg){
 	$('#messages').append($('<li>').text(msg));
 })
 
+function validateMessage(msg) {
+// check whether the message is blank, or is a "command" (starting with '/')
+	if(msg === "" || msg === '\n'){
+			alert('Nothing to say?')
+			return false;
+	} else{
+		if (msg[0] != '/'){
+			return true;
+		} else{
+			if (msg.substring(0,5) === "/nick"){
+				// change name
+				if (msg.substring(5,msg.length) != ""){
+					if(confirm("Changing name to" + msg.substring(5,msg.length))){
+						changeUser(msg.substring(5,msg.length));
+					}
+				} else {
+					alert('Name cannot be blank.');
+				}
+				return false;
+/*			} else if(msg = '/ end'){
+				if(confirm("Do you want to quit?")){
+					alert('Goodbye');
+					close(); // doesn't work
+				}*/
+			} 
+			else{
+				alert('Command not available');
+				return false;
+			}
+		}
+	}
+};
