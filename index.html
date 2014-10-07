@@ -8,20 +8,28 @@
     </style>
   </head>
   <body>
-    <h1>Speak Friend, and Enter</h1>
-    <div class = "matting">
-      <div class = "chat-container">
-<form action="">      
-        <p id="msgDescription">What do you have to say for yourself?</p>
-        <p><input type="text" id="m" ></input> </p>  
-        <button>Send now</button>
-</form>
+    <div class = "panel_cover">
+    <div class = "panel-cover--overlay">   
+      <h1>Speak Friend, and Enter</h1>
+
+      <div class = "matting">
+        <div class = "chat-container">
+          <form action="">      
+                  <p id="msgDescription">What do you have to say for yourself?</p>
+                  <p><input type="text" id="m" ></input> </p>  
+                  <button>Send now</button>
+          </form>
+
           <h2>Here shall we chat!</h2> 
           <ul id="messages"></ul>
+
+          </div>
         </div>
+       <p class="navigation"><a href ="http://www.figuresthingsout.com">Back to Blog</a></p>
+
       </div>
-    
-    </div>
+      </div>
+       </div>
 
     <script type="text/javascript" src = "/socket.io/socket.io.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>

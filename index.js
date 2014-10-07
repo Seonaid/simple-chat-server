@@ -9,6 +9,7 @@ app.get('/', function(req, res){
 
 app.use("/script.js", express.static(__dirname + '/script.js'));
 app.use("/style.css", express.static(__dirname + '/style.css'));
+app.use("/assets", express.static(__dirname + '/assets'));
 
 io.on('connection', function(socket){
 	console.log('a user connected');
