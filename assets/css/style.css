@@ -2,7 +2,7 @@
 @import 'http://fonts.googleapis.com/css?family=Raleway:400,700|Roboto+Slab:300,400)';
 
 body {
-  background: url(assets/images/background-cover.jpg) top left no-repeat #666666;
+  background: url(../images/background-cover.jpg) top left no-repeat #666666;
 }
 
 @font-face {
@@ -38,7 +38,7 @@ h2 {
   width: 100%;
   max-width: none;
   height: 100%;
-  background: url(assets/images/background-cover.jpg) top left no-repeat #666666;
+  background: url(../images/background-cover.jpg) top left no-repeat #666666;
   background-size: cover; }
 
  .panel-cover--overlay {

@@ -7,8 +7,6 @@ app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
 });
 
-app.use("/script.js", express.static(__dirname + '/script.js'));
-app.use("/style.css", express.static(__dirname + '/style.css'));
 app.use("/assets", express.static(__dirname + '/assets'));
 
 io.on('connection', function(socket){
