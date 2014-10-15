@@ -13,6 +13,7 @@ function changeUser (nickName) {
 	var something = document.getElementById("msgDescription").lastChild; 
 	// alert(something);
 	document.getElementById("msgDescription").replaceChild(newText, something);
+ //  	socket.emit('name change', userName + ':' + nickName);
 	document.getElementById("m").focus();
 }
 
@@ -32,6 +33,21 @@ $('form').submit(function(){
 socket.on('chat message', function(msg){
 	$('#messages').prepend($('<li>').text(msg));
 })
+
+socket.on('user connection', function(){
+	$('#messages').prepend($('<li>').text('Another person joined!'));
+})
+
+socket.on('name change', function(names){
+	var res = names.split(':');
+	$('#messages').prepend($('<li>').text(res[0] + "changed their name to " + res[1]));
+})
+
+/*
+socket.on('name change', function(n1, n2){
+	$('#messages').prepend($('<li>').text(n1 + "changed name to " + n2));
+})
+*/
 
 function validateMessage(msg) {
 // check whether the message is blank, or is a "command" (starting with '/')
