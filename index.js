@@ -17,16 +17,19 @@ app.use("/assets", express.static(__dirname + '/assets'));
 
 io.on('connection', function(socket){
 	console.log('a user connected');
-	io.emit('user connection');
+	socket.emit('chat message', "Welcome to Friendly Chat!");
+	socket.broadcast.emit('user connection');
 	client.setnx('userCount', 1);
 
 	numUsers = client.get('userCount', function(err, reply){
 		console.log("Number connected: " + reply);
+		io.sockets.emit('chat message', "There are " + reply + " users in the room.");
 		client.incr('userCount');
 	});
 	
 	socket.on('disconnect', function(){
 		client.decr('userCount');
+		io.sockets.emit('user disconnection');
 	})
 
 	socket.on('chat message', function (msg) {

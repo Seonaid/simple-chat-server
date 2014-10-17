@@ -1,21 +1,21 @@
 // client side scripting for chat app
 
-var userName = "";   // remember: userName is global in scope. In future iterations, it should be passed by a login script.
+var localName = "";   // remember: localName is global in scope. In future iterations, it should be passed by a login script.
 
-// Check whether user is "logged in" (in fact, at this point, just whether a userName exists)
-if (!userName) {
-	var userName = prompt("What is your name?");
-	changeUser(userName);
+// Check whether user is "logged in" (in fact, at this point, just whether a localName exists)
+if (!localName) {
+	var localName = prompt("What is your name?");
+	changeUser(localName);
 }
 
 function changeUser (nickName) {
-	// nickName is only scoped within changeUser... using assignment to put it back into global userName
-	userName = nickName;
+	// nickName is only scoped within changeUser... using assignment to put it back into global localName
+	localName = nickName;
 	var newText = document.createTextNode("What do you have to say for yourself, " + nickName + "?");
 	var something = document.getElementById("msgDescription").lastChild; 
 	// alert(something);
 	document.getElementById("msgDescription").replaceChild(newText, something);
- //  	socket.emit('name change', userName + ':' + nickName);
+ //  	socket.emit('name change', localName + ':' + nickName);
 	document.getElementById("m").focus();
 }
 
@@ -23,7 +23,7 @@ var socket = io();
 $('form').submit(function(){
 	var purple = $('#m').val();
 	if (validateMessage(purple)){
-		socket.emit('chat message', userName + ': ' + $('#m').val());
+		socket.emit('chat message', localName + ': ' + $('#m').val());
 		$('#m').val('');
 		return false;
 	} else{
@@ -43,6 +43,10 @@ socket.on('user connection', function(){
 socket.on('name change', function(names){
 	var res = names.split(':');
 	$('#messages').prepend($('<li>').text(res[0] + "changed their name to " + res[1]));
+})
+
+socket.on('user disconnection', function(){
+	$('#messages').prepend($('<li>').text('Somebody left the chat.'));
 })
 
 /*
