@@ -1,3 +1,5 @@
+// server side scripting for chat app
+
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
@@ -17,10 +19,12 @@ io.on('connection', function(socket){
 	console.log('a user connected');
 	io.emit('user connection');
 	client.setnx('userCount', 1);
+
 	numUsers = client.get('userCount', function(err, reply){
-	console.log("Number connected: " + reply);
-	client.incr('userCount');
-});
+		console.log("Number connected: " + reply);
+		client.incr('userCount');
+	});
+	
 	socket.on('disconnect', function(){
 		client.decr('userCount');
 	})
@@ -34,6 +38,6 @@ io.on('connection', function(socket){
 		});
 });
 
-http.listen(3000, function(){
-	console.log('listening on *:3000');
+http.listen(8080, function(){
+	console.log('listening on *:8080');
 });

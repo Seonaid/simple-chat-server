@@ -1,3 +1,5 @@
+// client side scripting for chat app
+
 var userName = "";   // remember: userName is global in scope. In future iterations, it should be passed by a login script.
 
 // Check whether user is "logged in" (in fact, at this point, just whether a userName exists)
