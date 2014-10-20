@@ -1,12 +1,11 @@
 // client side scripting for chat app
 
-var localName = "";   // remember: localName is global in scope. In future iterations, it should be passed by a login script.
-
-// Check whether user is "logged in" (in fact, at this point, just whether a localName exists)
-if (!localName) {
-	var localName = prompt("What is your name?");
-	changeUser(localName);
-}
+   // remember: localName is global in scope. In future iterations, it should be passed by a login script.
+var server = io();
+server.on('connect', function(data){
+	localName = prompt("How do you call yourself?");
+	server.emit('join', localName);
+});
 
 function changeUser (nickName) {
 	// nickName is only scoped within changeUser... using assignment to put it back into global localName
