@@ -35,8 +35,8 @@ socket.on('chat message', function(msg){
 	$('#messages').prepend($('<li>').text(msg));
 })
 
-socket.on('user connection', function(){
-	$('#messages').prepend($('<li>').text('Another person joined!'));
+socket.on('user connection', function(name){
+	$('#messages').prepend($('<li>').text(name + ' just joined!'));
 })
 
 socket.on('name change', function(names){

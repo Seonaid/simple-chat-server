@@ -17,6 +17,9 @@ var storeMessage = function(name, data){
 var redis = require ("redis");
 var client = redis.createClient();
 
+var clear = client.set('userCount', 1);
+var clear = client.del('chatters');
+
 client.hgetall("users", function (err, obj) {
     console.dir(obj);
 });
@@ -28,32 +31,37 @@ app.get('/', function(req, res){
 app.use("/assets", express.static(__dirname + '/assets'));
 
 io.on('connection', function(socket){
-	console.log('a user connected');
-	socket.emit('chat message', "Welcome to Friendly Chat!");
-	socket.broadcast.emit('user connection');
-	client.setnx('userCount', 1);
 	client.setnx('userId', 1000);
-	client.incr('userId');
+
 
 	socket.on('join', function(name){
+		client.incr('userId');
 		var userId = client.get('userId', function(err, reply){
 			console.log('UserID is ' + reply);
-			var users = client.hset('users', name, reply);
+			var users = client.hset('users', reply, name);
 
-			client.hget('users', name, function(err, reply){
-				console.log(name + " is user " + reply);
+			client.hget('users', reply, function(err, name){
+				console.log("User " + reply + " is called " + name);
 			});
+			client.lpush('chatters', name);
+
+			console.log(client.lrange('chatters', 0, -1));
+
 		});
 
+		console.log('a user connected');
+		socket.emit('chat message', "Welcome to Friendly Chat, " + name + "!");
+		socket.broadcast.emit('user connection', name);
 
-	
-	});
 
-	numUsers = client.get('userCount', function(err, reply){
-		console.log("Number connected: " + reply);
-		io.sockets.emit('chat message', "There are " + reply + " users in the room.");
-		client.incr('userCount');
-		console.log('once!');
+
+
+
+		var numUsers = client.get('userCount', function(err, reply){
+			console.log("Number connected: " + reply);
+			io.sockets.emit('chat message', "There are " + reply + " users in the room.");
+			client.incr('userCount');
+		});
 	});
 	
 	socket.on('disconnect', function(){
