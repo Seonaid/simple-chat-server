@@ -3,9 +3,6 @@
   <head>
     <title>Friendly Chat</title>
     <link type="text/css" rel="stylesheet" href="/assets/css/style.css"/>
-    <style>
-
-    </style>
   </head>
   <body>
     <div class = "panel_cover">
@@ -14,14 +11,21 @@
 
       <div class = "matting">
         <div class = "chat-container">
-          <form action="">      
-                  <p id="msgDescription">What do you have to say for yourself?</p>
-                  <p><input type="text" id="m" ></input> </p>  
-                  <button>Send now</button>
-          </form>
+          <div id = "top-section">
+            <form action="">      
+                    <p id="msgDescription">What do you have to say for yourself?</p>
+                    <p><input type="text" id="m" ></input> </p>  
+                    <button>Send now</button>
+            </form>
 
-          <h2>Here shall we chat!</h2> 
-          <ul id="messages"></ul>
+             <h2>Here shall we chat!</h2>
+          </div>
+
+          <div id = "main-section">
+            <table width ="100%" >
+              <tr><td id="chatlist" >Currently here:</td> <td id="messages"><ul ></ul></td> </tr>
+            </table>
+          </div>
 
           </div>
         </div>
