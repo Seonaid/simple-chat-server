@@ -36,37 +36,45 @@ io.on('connection', function(socket){
 
 	socket.on('join', function(name){
 		client.incr('userId');
+		socket.username = name;
 		var userId = client.get('userId', function(err, reply){
 			console.log('UserID is ' + reply);
 			var users = client.hset('users', reply, name);
 
 			client.hget('users', reply, function(err, name){
 				console.log("User " + reply + " is called " + name);
-			});
-			client.lpush('chatters', name);
-
-			console.log(client.lrange('chatters', 0, -1));
-
+				//refactor to use set instead
+				client.sadd('chatters', name, function(){
+					console.log('Adding ' + name + ' to chatters.');
+					client.smembers('chatters', function(err,data){
+						console.log('emitting: ', data);
+						io.sockets.emit('chatters', data);
+					});
+				});
+			});			
 		});
 
 		console.log('a user connected');
 		socket.emit('chat message', "Welcome to Friendly Chat, " + name + "!");
 		socket.broadcast.emit('user connection', name);
 
-
-
-
-
 		var numUsers = client.get('userCount', function(err, reply){
 			console.log("Number connected: " + reply);
-			io.sockets.emit('chat message', "There are " + reply + " users in the room.");
+//			io.sockets.emit('chat message', "There are " + reply + " users in the room.");
 			client.incr('userCount');
 		});
 	});
 	
 	socket.on('disconnect', function(){
 		client.decr('userCount');
-		io.sockets.emit('user disconnection');
+		io.sockets.emit('user disconnection', socket.username);
+		client.srem('chatters', socket.username, function(error, data){
+			console.log('removing ' + socket.username);
+			client.smembers('chatters', function(err,data){
+				console.log('emitting: ', data);
+				io.sockets.emit('chatters', data);
+			});
+		});
 	})
 
 	socket.on('chat message', function (msg) {

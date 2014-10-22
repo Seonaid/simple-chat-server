@@ -23,6 +23,27 @@ h2 {
 	text-align: center;
 }
 
+
+a {
+	color: #fafafa;
+	text-align: center;
+}
+
+table {
+	border: 2px solid #5c5961;
+	border-radius: 5px;
+	background: rgba(21, 111, 120, 0.6); color: #fafafa;
+}
+
+tr{
+	border: 0;
+}
+
+
+#main-section {
+
+}
+
 .matting {
 	margin-right: auto;
 	margin-left: auto;
@@ -61,33 +82,42 @@ h2 {
 	margin-left: auto;
 	margin-right: auto;
 	box-shadow: 10px 10px 5px #888888;
-
+	height: 600px;
 }
 
-a {
-	color: #fafafa;
-	text-align: center;
-}
 
 #msgDescription{
 	padding-top: 10px;
 	font-size: 20px;
 }
 
-#messages {
+
+#chatlist{
+	width: 20%;
 	text-align: left;
-	background-color: rgba(21, 111, 120, 0.6);
-	color: #5c5961;
+	vertical-align: top;
+	color: #fafafa;
+	border-right: 2px solid #5c5961;
+}
+
+#messages {
+	
+	float: right;
+	text-align: left;
+	background-color: #eee; 
+	color: 
 	margin-top: 5px;
-	border: 2px solid #5c5961;
-	border-radius: 5px;
+
 	height: 300px;
+	width: 100%;
 	overflow: auto;
 
 }
-#messages { list-style-type: none; margin: 0; padding: 0; }
-#messages li { padding: 5px 10px; color: #fafafa;}
-#messages li:nth-child(odd) { background: #eee; color: #5c5961;}
+#messages { list-style-type: none; }
+#messages li { padding: 5px 10px; color: #5c5961;}
+#messages li:nth-child(odd) { background: rgba(21, 111, 120, 0.6); color: #fafafa;}
+
+
 
 #m {
 	margin-left: auto;

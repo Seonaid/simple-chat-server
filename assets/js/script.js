@@ -31,22 +31,39 @@ $('form').submit(function(){
 	}
 	
 });
+
 socket.on('chat message', function(msg){
 	$('#messages').prepend($('<li>').text(msg));
-})
+});
 
 socket.on('user connection', function(name){
 	$('#messages').prepend($('<li>').text(name + ' just joined!'));
-})
+});
 
 socket.on('name change', function(names){
 	var res = names.split(':');
 	$('#messages').prepend($('<li>').text(res[0] + "changed their name to " + res[1]));
-})
+});
 
-socket.on('user disconnection', function(){
-	$('#messages').prepend($('<li>').text('Somebody left the chat.'));
-})
+socket.on('user disconnection', function(name){
+	$('#messages').prepend($('<li>').text(name + ' left the chat.'));
+});
+
+socket.on('chatters', function(chatters){
+	document.getElementById("chatlist").textContent = "Currently here: ";
+
+	for (i = 0; i <= chatters.length; i++) {
+		$('#chatlist').append($('<p>').text(chatters[i]));
+	}	
+
+//	alert(chatters);
+/*
+
+	 content = content + chatters[i] + '<br>';
+	}
+*/
+
+});
 
 /*
 socket.on('name change', function(n1, n2){
