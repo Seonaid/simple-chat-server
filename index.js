@@ -41,13 +41,23 @@ io.on('connection', function(socket){
 		socket.username = name;
 		var userId = client.get('userId', function(err, reply){
 			var users = client.hset('users', reply, name);
+			//send list of currently connected users
 			client.hget('users', reply, function(err, name){
 				client.sadd('chatters', name, function(){
 					client.smembers('chatters', function(err,data){
 						io.sockets.emit('chatters', data);
 					});
 				});
-			});			
+			});
+// send list of last 15 messages
+			client.lrange('message_list', -14, -1, function(err, reply){
+				for(i = 0; i < reply.length; i ++) {
+//					console.log(i + ' = ' + reply[i]);
+					socket.emit('chat message', reply[i]);
+				}
+				
+			});
+
 		});
 
 		socket.emit('chat message', "Welcome to Friendly Chat, " + name + "!");
@@ -69,10 +79,12 @@ io.on('connection', function(socket){
 	})
 
 	socket.on('chat message', function (msg) {
-		client.lpush("message_list", msg);
+		client.rpush("message_list", msg);
+/*
 		client.lrange("message_list", 0, -1, function(err, reply){
 			console.log(reply);
 		});
+*/
 		io.emit('chat message', msg);
 		});
 });
