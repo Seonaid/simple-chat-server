@@ -80,6 +80,7 @@ io.on('connection', function(socket){
 
 	socket.on('chat message', function (msg) {
 		client.rpush("message_list", msg);
+		client.expire("message_list", 3600);
 /*
 		client.lrange("message_list", 0, -1, function(err, reply){
 			console.log(reply);
