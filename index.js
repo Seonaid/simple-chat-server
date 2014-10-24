@@ -20,9 +20,12 @@ var client = redis.createClient();
 var clear = client.set('userCount', 1);
 var clear = client.del('chatters');
 
+/*
 client.hgetall("users", function (err, obj) {
-    console.dir(obj);
+//    console.dir(obj);
+//    console.log('this is where we will validate');
 });
+*/
 
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
@@ -33,34 +36,24 @@ app.use("/assets", express.static(__dirname + '/assets'));
 io.on('connection', function(socket){
 	client.setnx('userId', 1000);
 
-
 	socket.on('join', function(name){
 		client.incr('userId');
 		socket.username = name;
 		var userId = client.get('userId', function(err, reply){
-			console.log('UserID is ' + reply);
 			var users = client.hset('users', reply, name);
-
 			client.hget('users', reply, function(err, name){
-				console.log("User " + reply + " is called " + name);
-				//refactor to use set instead
 				client.sadd('chatters', name, function(){
-					console.log('Adding ' + name + ' to chatters.');
 					client.smembers('chatters', function(err,data){
-						console.log('emitting: ', data);
 						io.sockets.emit('chatters', data);
 					});
 				});
 			});			
 		});
 
-		console.log('a user connected');
 		socket.emit('chat message', "Welcome to Friendly Chat, " + name + "!");
 		socket.broadcast.emit('user connection', name);
 
 		var numUsers = client.get('userCount', function(err, reply){
-			console.log("Number connected: " + reply);
-//			io.sockets.emit('chat message', "There are " + reply + " users in the room.");
 			client.incr('userCount');
 		});
 	});
@@ -69,20 +62,18 @@ io.on('connection', function(socket){
 		client.decr('userCount');
 		io.sockets.emit('user disconnection', socket.username);
 		client.srem('chatters', socket.username, function(error, data){
-			console.log('removing ' + socket.username);
 			client.smembers('chatters', function(err,data){
-				console.log('emitting: ', data);
 				io.sockets.emit('chatters', data);
 			});
 		});
 	})
 
 	socket.on('chat message', function (msg) {
-		client.set("pronto", msg);
-		client.get("pronto", function(err, reply){
-			console.log("Reply: " + reply);
+		client.lpush("message_list", msg);
+		client.lrange("message_list", 0, -1, function(err, reply){
+			console.log(reply);
 		});
-			io.emit('chat message', msg);
+		io.emit('chat message', msg);
 		});
 });
 
