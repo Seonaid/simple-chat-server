@@ -6,34 +6,36 @@
   </head>
   <body>
     <div class = "panel_cover">
-    <div class = "panel-cover--overlay">   
-      <h1>Speak Friend, and Enter</h1>
+      <div class = "panel-cover--overlay">   
+        <h1>Speak Friend, and Enter</h1>
 
-      <div class = "matting">
-        <div class = "chat-container">
-          <div id = "top-section">
-            <form action="">      
-                    <p id="msgDescription">What do you have to say for yourself?</p>
-                    <p><input type="text" id="m" ></input> </p>  
-                    <button>Send now</button>
-            </form>
+        <div class = "matting">
+          <div class = "container">
+            <div id = "top-section">    
+              <p id="msgDescription">What do you have to say for yourself?</p>
+              <p><input type="text" id="m" ></input> </p>  
+              <button>Send now</button>
 
-             <h2>Here shall we chat!</h2>
-          </div>
 
-          <div id = "main-section">
-            <table width ="100%" >
+              <h2>Here shall we chat!</h2>
+            </div> <!-- top-section -->
+
+            <div id = "main-section">
+              <table width ="100%" >
               <tr><td id="chatlist" >Currently here:</td> <td id="messages"><ul ></ul></td> </tr>
-            </table>
-          </div>
+              </table>
+            </div> <!-- main-section -->
 
-          </div>
-        </div>
-       <p class="navigation"><a href ="http://www.figuresthingsout.com">Back to Blog</a></p>
+            </div> <!-- chat-container -->
 
-      </div>
-      </div>
-       </div>
+            <div class = "container hidden">
+              This is where the login form goes.
+            </div>
+          </div> <!-- matting -->
+          <p class="navigation"><a href ="http://www.figuresthingsout.com">Back to Blog</a></p>
+
+        </div> <!-- panel_cover-overlay -->
+      </div> <!-- panel_cover -->
 
     <script type="text/javascript" src = "/socket.io/socket.io.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>

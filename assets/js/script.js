@@ -2,10 +2,12 @@
 
    // remember: localName is global in scope. In future iterations, it should be passed by a login script.
 var server = io();
+
 server.on('connect', function(data){
 	localName = prompt("How do you call yourself?");
 	server.emit('join', localName);
 });
+
 
 function changeUser (nickName) {
 	// nickName is only scoped within changeUser... using assignment to put it back into global localName
@@ -18,18 +20,27 @@ function changeUser (nickName) {
 	document.getElementById("m").focus();
 }
 
+function sendMessageToServer(){
+ // put the code for emitting the chat message here
+ 		var purple = $('#m').val();
+		if (validateMessage(purple)){
+			socket.emit('chat message', localName + ': ' + $('#m').val());
+			$('#m').val('');
+			return false;
+		} else{
+			$('#m').val('');
+			return false;
+		}
+}
+
 var socket = io();
-$('form').submit(function(){
-	var purple = $('#m').val();
-	if (validateMessage(purple)){
-		socket.emit('chat message', localName + ': ' + $('#m').val());
-		$('#m').val('');
-		return false;
-	} else{
-		$('#m').val('');
-		return false;
+// listen for messages
+$('#top-section').on("click", "button", sendMessageToServer);
+$('#top-section').on("keyup", function(event){
+	var key = event.keyCode;
+	if (key === 13) {
+		sendMessageToServer();
 	}
-	
 });
 
 socket.on('chat message', function(msg){
