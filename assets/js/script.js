@@ -99,6 +99,10 @@ socket.on('validate name', function(name, valid){
 		$("#messageInput").toggleClass("hidden");
 		$(".wideSide").toggleClass("hidden");
 		localName = name;
+		var newText = document.createTextNode("What do you have to say for yourself, " + name + "?");
+		var something = document.getElementById("msgDescription").lastChild; 
+		// alert(something);
+		document.getElementById("msgDescription").replaceChild(newText, something);
 		socket.emit('join', name);
 	} else {
 		$("#response").text('Name is in use.');
@@ -112,6 +116,10 @@ socket.on('login-message', function(name, valid){
 		$(".wideSide").toggleClass("hidden");
 		socket.emit('join', name);
 		localName = name;
+		var newText = document.createTextNode("What do you have to say for yourself, " + name + "?");
+		var something = document.getElementById("msgDescription").lastChild; 
+		// alert(something);
+		document.getElementById("msgDescription").replaceChild(newText, something);
 	} else {
 		$("#response").text('Login unsuccessful.');
 	}
