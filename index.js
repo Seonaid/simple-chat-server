@@ -82,7 +82,7 @@ io.on('connection', function(socket){
 
 	socket.on('chat message', function (msg) {
 		client.rpush("message_list", msg);
-		client.expire("message_list", 3600);
+		client.expire("message_list", 3600); // entire list will disappear 1 hour after the conversation is done.
 /*
 		client.lrange("message_list", 0, -1, function(err, reply){
 			console.log(reply);
@@ -90,6 +90,50 @@ io.on('connection', function(socket){
 */
 		io.emit('chat message', msg);
 		});
+
+	socket.on('newUser', function(name, password){
+		console.log("Checking for " + name + password);
+		client.exists(name, function(error, exists){
+//			console.log(name + exists);
+			socket.emit('validate name', name, !exists);
+			if(!exists) { // if the name is not already in use, make a new record
+				client.get("my_new_user", function(error, reply){
+					var hashName = "user:" + reply;
+					client.set(name, reply); //now we can look up by username
+					client.hmset(hashName, "name", name); // and we can then look up username:Id
+					client.hmset(hashName, "password", password);
+					client.incr("my_new_user");
+				});
+				console.log("hi " + name);
+ // user logged in... should this be a separate step? I still need to add sessions and cookies and all that jazz
+			} else {
+				console.log("User already exists.");  // need to add this to the login screen.
+			} // end of if structure
+		}); // end of client.exists
+	}); // end of 'newUser'
+
+	socket.on('login', function(username, password){
+		console.log(username, password);
+		client.exists(username, function(error, exists){
+			if(!exists){
+				socket.emit('login-message', false); //if the user is not registered
+			} else {
+				client.get(username, function(error, reply){
+					hashName = "user:" + reply;
+					console.log("Looking in " + hashName);
+					client.hget(hashName, "password", function(error, reply){
+						console.log("password is " + password);
+						console.log("returned is " + reply);
+						if(reply === password){
+							socket.emit('login-message', username, true); // success!
+						} else {
+							socket.emit('login-message', username, false); // if the password is wrong
+						}
+					}); // end of looking up password
+				}); // end of looking up username
+			} // end of if structure for whether the username exists
+		}); 
+	}); // end of login
 });
 
 http.listen(8080, function(){
