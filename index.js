@@ -94,8 +94,9 @@ io.on('connection', function(socket){
 	socket.on('newUser', function(name, password){
 		console.log("Checking for " + name + password);
 		client.exists(name, function(error, exists){
-//			console.log(name + exists);
-			socket.emit('validate name', name, !exists);
+			console.log(name + exists);
+			var content = "Name is in use."
+			socket.emit('login-message', name, !exists, content); //if the user is not registered
 			if(!exists) { // if the name is not already in use, make a new record
 				client.get("my_new_user", function(error, reply){
 					var hashName = "user:" + reply;
@@ -112,22 +113,24 @@ io.on('connection', function(socket){
 		}); // end of client.exists
 	}); // end of 'newUser'
 
-	socket.on('login', function(username, password){
-		console.log(username, password);
-		client.exists(username, function(error, exists){
+	socket.on('login', function(name, password){
+		console.log(name, password);
+		client.exists(name, function(error, exists){
 			if(!exists){
-				socket.emit('login-message', false); //if the user is not registered
+				var content = "Login unsuccessful."
+				socket.emit('login-message', name, false, content); //if the user is not registered
 			} else {
-				client.get(username, function(error, reply){
+				client.get(name, function(error, reply){
 					hashName = "user:" + reply;
 					console.log("Looking in " + hashName);
 					client.hget(hashName, "password", function(error, reply){
 						console.log("password is " + password);
 						console.log("returned is " + reply);
 						if(reply === password){
-							socket.emit('login-message', username, true); // success!
+							socket.emit('login-message', name, true); // success!
 						} else {
-							socket.emit('login-message', username, false); // if the password is wrong
+							var content = "Login unsuccessful."
+							socket.emit('login-message', name, false); // if the password is wrong
 						}
 					}); // end of looking up password
 				}); // end of looking up username

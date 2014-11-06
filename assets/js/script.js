@@ -75,6 +75,7 @@ $('#login-register').on("click", "a", function(event){
 	event.preventDefault();
 	$(this).closest("#login-register").find(".login-button").toggleClass("hidden");
 	$(this).closest("#login-register").find("a").toggleClass("hidden");
+	$("#response").text("");
 });
 
 $('#login-register').on("click", "button", function(event){
@@ -92,8 +93,9 @@ $('#login-register').on("click", "button", function(event){
 });
 
 // refactor the next two functions to do the same thing but with a "message" parameter
-socket.on('validate name', function(name, valid){
-	alert("received a " + valid);
+
+/* socket.on('validate name', function(name, valid){
+//	alert("received a " + valid);
 	if(valid){
 		// log in and make chat area visible
 		$("#messageInput").toggleClass("hidden");
@@ -108,9 +110,10 @@ socket.on('validate name', function(name, valid){
 		$("#response").text('Name is in use.');
 	}
 }); // end of 'validate name'
+*/
 
-socket.on('login-message', function(name, valid){
-//	alert("received a " + valid + "for user" + name);
+socket.on('login-message', function(name, valid, content){
+	alert("received a " + valid + "for user" + name + content);
 	if(valid){
 		$("#messageInput").toggleClass("hidden");
 		$(".wideSide").toggleClass("hidden");
@@ -121,7 +124,7 @@ socket.on('login-message', function(name, valid){
 		// alert(something);
 		document.getElementById("msgDescription").replaceChild(newText, something);
 	} else {
-		$("#response").text('Login unsuccessful.');
+		$("#response").text(content);
 	}
 
 });// end of login-message
