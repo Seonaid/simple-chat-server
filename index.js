@@ -13,15 +13,13 @@ var redis = require ("redis");
 var client = redis.createClient();
 
 // reset current numbers of users and list of chatters when the chat app is started
-var clear = client.set('userCount', 1);
+var clear = client.set('userCount', 0);
 var clear = client.del('chatters');
 
 // deal with routing
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
 });
-
-app.use('/', express.static(__dirname + '/public'));
 
 app.use("/assets", express.static(__dirname + '/assets'));
 
@@ -32,6 +30,10 @@ io.on('connection', function(socket){
 
 	socket.on('join', function(name){
 		client.incr('userId');
+		client.incr('userCount');
+		client.get('userCount', function(err, reply){
+			console.log("counting" + reply);
+		});
 		socket.username = name;
 		var userId = client.get('userId', function(err, reply){
 			var users = client.hset('users', reply, name);
@@ -57,14 +59,12 @@ io.on('connection', function(socket){
 		socket.broadcast.emit('user connection', name);
 		var something = client.get('userCount', function(err, reply){
 			console.log('userCount is ' + something + " or " + reply);
-			client.incr('userCount');
-
 		});
 	});
 	
 	socket.on('disconnect', function(){ 
 		// when a user disconnects, remove them from list and subtract 1 from the number of users
-//		client.decr('userCount');
+		client.decr('userCount');
 		io.sockets.emit('user disconnection', socket.username);
 		client.srem('chatters', socket.username, function(error, data){
 			client.smembers('chatters', function(err,data){
@@ -96,7 +96,7 @@ io.on('connection', function(socket){
 				console.log("hi " + name);
  // user logged in... should this be a separate step? I still need to add sessions and cookies and all that jazz
 			} else {
-				console.log("User already exists.");  // need to add this to the login screen.
+				console.log("User already exists.");
 			} // end of if structure
 		}); // end of client.exists
 	}); // end of 'newUser'
@@ -118,7 +118,7 @@ io.on('connection', function(socket){
 							socket.emit('login-message', name, true); // success!
 						} else {
 							var content = "Login unsuccessful."
-							socket.emit('login-message', name, false); // if the password is wrong
+							socket.emit('login-message', name, false, content); // if the password is wrong
 						}
 					}); // end of looking up password
 				}); // end of looking up username

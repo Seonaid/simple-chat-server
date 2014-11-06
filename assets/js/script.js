@@ -1,37 +1,17 @@
 // client side scripting for chat app
-
-   // remember: localName is global in scope. In future iterations, it should be passed by a login script.
-var socket = io();
-
-/*
-server.on('connect', function(data){
-	localName = prompt("How do you call yourself?");
-	server.emit('join', localName);
-});
-*/
-
-function changeUser (nickName) {
-	// nickName is only scoped within changeUser... using assignment to put it back into global localName
-	localName = nickName;
-	var newText = document.createTextNode("What do you have to say for yourself, " + nickName + "?");
-	var something = document.getElementById("msgDescription").lastChild; 
-	// alert(something);
-	document.getElementById("msgDescription").replaceChild(newText, something);
- //  	socket.emit('name change', localName + ':' + nickName);
-	document.getElementById("m").focus();
-}
+var socket = io(); // create connection to socket.io
 
 function sendMessageToServer(){
- // put the code for emitting the chat message here
- 		var purple = $('#m').val();
-		if (validateMessage(purple)){
-			socket.emit('chat message', localName + ': ' + $('#m').val());
-			$('#m').val('');
-			return false;
-		} else{
-			$('#m').val('');
-			return false;
-		}
+ // emitting the chat message
+	var newMessage = $('#m').val();
+	if (validateMessage(newMessage)){
+		socket.emit('chat message', localName + ': ' + $('#m').val());
+		$('#m').val('');
+		return false;
+	} else{
+		$('#m').val('');
+		return false;
+	}
 }
 
 function validateMessage(msg) {
@@ -42,22 +22,9 @@ function validateMessage(msg) {
 	} else{
 		if (msg[0] != '/'){
 			return true;
-		} else{
-			if (msg.substring(0,5) === "/nick"){
-				// change name
-				if (msg.substring(5,msg.length) != ""){
-					if(confirm("Changing name to" + msg.substring(5,msg.length))){
-						changeUser(msg.substring(5,msg.length));
-					}
-				} else {
-					alert('Name cannot be blank.');
-				}
-				return false;
-			} 
-			else{
-				alert('Command not available');
-				return false;
-			}
+		} else { 
+			alert('Command not available');
+			return false;
 		}
 	}
 }
@@ -71,6 +38,7 @@ $('#top-section').on("keydown", function(event){
 	}
 });
 
+// switch between login and registration options
 $('#login-register').on("click", "a", function(event){
 	event.preventDefault();
 	$(this).closest("#login-register").find(".login-button").toggleClass("hidden");
@@ -78,12 +46,12 @@ $('#login-register').on("click", "a", function(event){
 	$("#response").text("");
 });
 
+// submit registration or login to server for processing
 $('#login-register').on("click", "button", function(event){
 	if($(this).val() === "Register"){
 		var tryUser = $('#username').val();
 		var tryPassword = $('#password').val();
 		socket.emit('newUser', tryUser, tryPassword);
-		alert(tryUser);
 	} else {
 		var tryUser = $('#username').val();
 		var tryPassword = $('#password').val();
@@ -92,71 +60,45 @@ $('#login-register').on("click", "button", function(event){
 
 });
 
-// refactor the next two functions to do the same thing but with a "message" parameter
-
-/* socket.on('validate name', function(name, valid){
-//	alert("received a " + valid);
-	if(valid){
-		// log in and make chat area visible
-		$("#messageInput").toggleClass("hidden");
-		$(".wideSide").toggleClass("hidden");
-		localName = name;
-		var newText = document.createTextNode("What do you have to say for yourself, " + name + "?");
-		var something = document.getElementById("msgDescription").lastChild; 
-		// alert(something);
-		document.getElementById("msgDescription").replaceChild(newText, something);
-		socket.emit('join', name);
-	} else {
-		$("#response").text('Name is in use.');
-	}
-}); // end of 'validate name'
-*/
-
+// when login or registration is successful, show chat messages. Otherwise, display error msg.
 socket.on('login-message', function(name, valid, content){
-	alert("received a " + valid + "for user" + name + content);
+//	alert("received a " + valid + "for user" + name + content);
 	if(valid){
+		localName = name;		
+		socket.emit('join', name);
+		// display message input and messages section
 		$("#messageInput").toggleClass("hidden");
 		$(".wideSide").toggleClass("hidden");
-		socket.emit('join', name);
-		localName = name;
+		// add name to prompt at top of page
 		var newText = document.createTextNode("What do you have to say for yourself, " + name + "?");
 		var something = document.getElementById("msgDescription").lastChild; 
 		// alert(something);
 		document.getElementById("msgDescription").replaceChild(newText, something);
 	} else {
+		// display error message
 		$("#response").text(content);
 	}
-
 });// end of login-message
 
+// add new messages to the top of the list
 socket.on('chat message', function(msg){
 	$('#messages').prepend($('<li>').text(msg));
 });
 
+// alerts for new users joining
 socket.on('user connection', function(name){
 	$('#messages').prepend($('<li>').text(name + ' just joined!'));
 });
-/*
-socket.on('name change', function(names){
-	var res = names.split(':');
-	$('#messages').prepend($('<li>').text(res[0] + "changed their name to " + res[1]));
-}); */
 
+// alert for users leaving
 socket.on('user disconnection', function(name){
 	$('#messages').prepend($('<li>').text(name + ' left the chat.'));
 });
 
+// updates the current list of participants
 socket.on('chatters', function(chatters){
 	document.getElementById("chatlist").textContent = "Currently here: ";
-
 	for (i = 0; i <= chatters.length; i++) {
 		$('#chatlist').append($('<p>').text(chatters[i]));
 	}
 });
-
-/*
-socket.on('name change', function(n1, n2){
-	$('#messages').prepend($('<li>').text(n1 + "changed name to " + n2));
-})
-*/
-
