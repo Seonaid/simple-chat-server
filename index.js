@@ -1,32 +1,22 @@
 // server side scripting for chat app
 
+// server creation and routing
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var numUsers = 0;
 
-var messages = [];
-var storeMessage = function(name, data){
-	messages.push({name: name, data: data});
-	if (messages.length > 10) {
-		messages.shift();
-	}
-}
+// redis used as data storage
 
 var redis = require ("redis");
 var client = redis.createClient();
 
+// reset current numbers of users and list of chatters when the chat app is started
 var clear = client.set('userCount', 1);
 var clear = client.del('chatters');
 
-/*
-client.hgetall("users", function (err, obj) {
-//    console.dir(obj);
-//    console.log('this is where we will validate');
-});
-*/
-
+// deal with routing
 app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html');
 });
@@ -34,6 +24,8 @@ app.get('/', function(req, res){
 app.use('/', express.static(__dirname + '/public'));
 
 app.use("/assets", express.static(__dirname + '/assets'));
+
+// socket.io messages to and from users
 
 io.on('connection', function(socket){
 	client.setnx('userId', 1000);
@@ -48,30 +40,31 @@ io.on('connection', function(socket){
 				client.sadd('chatters', name, function(){
 					client.smembers('chatters', function(err,data){
 						io.sockets.emit('chatters', data);
-					});
-				});
-			});
-// send list of last 15 messages
+					}); // emit current list of chatters to entire connected group
+				}); // end of adding new user to currently connected users
+			});  
+
+			// send last 15 messages when somebody connects
 			client.lrange('message_list', -14, -1, function(err, reply){
 				for(i = 0; i < reply.length; i ++) {
-//					console.log(i + ' = ' + reply[i]);
 					socket.emit('chat message', reply[i]);
-				}
-				
-			});
+				}	
+			}); // end of list of the last 15 messages
+		}); // end of retrieving 'userId'
 
-		});
-
+		// welcome new user and emit message that they have joined to other users
 		socket.emit('chat message', "Welcome to Friendly Chat, " + name + "!");
 		socket.broadcast.emit('user connection', name);
-
-		var numUsers = client.get('userCount', function(err, reply){
+		var something = client.get('userCount', function(err, reply){
+			console.log('userCount is ' + something + " or " + reply);
 			client.incr('userCount');
+
 		});
 	});
 	
-	socket.on('disconnect', function(){
-		client.decr('userCount');
+	socket.on('disconnect', function(){ 
+		// when a user disconnects, remove them from list and subtract 1 from the number of users
+//		client.decr('userCount');
 		io.sockets.emit('user disconnection', socket.username);
 		client.srem('chatters', socket.username, function(error, data){
 			client.smembers('chatters', function(err,data){
@@ -83,13 +76,8 @@ io.on('connection', function(socket){
 	socket.on('chat message', function (msg) {
 		client.rpush("message_list", msg);
 		client.expire("message_list", 3600); // entire list will disappear 1 hour after the conversation is done.
-/*
-		client.lrange("message_list", 0, -1, function(err, reply){
-			console.log(reply);
-		});
-*/
 		io.emit('chat message', msg);
-		});
+	});
 
 	socket.on('newUser', function(name, password){
 		console.log("Checking for " + name + password);
