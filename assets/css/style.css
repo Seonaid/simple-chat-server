@@ -25,7 +25,7 @@ h2 {
 
 
 a {
-	color: #fafafa;
+	color: #000;
 	text-align: center;
 }
 
@@ -37,19 +37,6 @@ table {
 
 tr{
 	border: 0;
-}
-
-
-#main-section {
-
-}
-
-.matting {
-	margin-right: auto;
-	margin-left: auto;
-	width: 60%;
-	background-color: #fafafa;
-
 }
 
 .panel-cover {
@@ -74,7 +61,15 @@ tr{
   background-image: -webkit-linear-gradient(-410deg, rgba(21, 111, 120, 0.6) 20%, rgba(6, 31, 33, 0.8));
   background-image: linear-gradient(140deg,rgba(21, 111, 120, 0.6) 20%, rgba(6, 31, 33, 0.8)); }
 
-.chat-container{
+.matting {
+	margin-right: auto;
+	margin-left: auto;
+	width: 60%;
+	background-color: #fafafa;
+
+}
+
+.container{
 	text-align: center;
 	padding-left: 15px;
 	padding-right: 15px;
@@ -85,6 +80,13 @@ tr{
 	height: 600px;
 }
 
+#main-section {
+	width: 100%;
+}
+
+.hidden{
+display:none;
+}
 
 #msgDescription{
 	padding-top: 10px;
@@ -93,23 +95,25 @@ tr{
 
 
 #chatlist{
+	float:left;
 	width: 20%;
 	text-align: left;
 	vertical-align: top;
+	background: rgba(21, 111, 120, 0.6); 
 	color: #fafafa;
-	border-right: 2px solid #5c5961;
+	height: 300px;
+/*	border-right: 2px solid #5c5961; */
 }
 
-#messages {
+.wideSide {
 	
 	float: right;
 	text-align: left;
 	background-color: #eee; 
 	color: 
 	margin-top: 5px;
-
 	height: 300px;
-	width: 100%;
+	width: 80%;
 	overflow: auto;
 
 }
@@ -117,10 +121,12 @@ tr{
 #messages li { padding: 5px 10px; color: #5c5961;}
 #messages li:nth-child(odd) { background: rgba(21, 111, 120, 0.6); color: #fafafa;}
 
-
-
 #m {
 	margin-left: auto;
 	margin-right: auto;
 	width: 85%;
+}
+#login-register{
+	width: 50%;
+	text-align: right;	
 }
