@@ -2,7 +2,9 @@
   "name": "socket-chat-example",
   "version": "0.2.0",
   "description": "server chat example",
+  "repository":"https://github.com/Seonaid/simple-chat-server.git",
   "dependencies": {
+    "crypto": "0.0.3",
     "express": "^4.9.5",
     "redis": "^0.12.1",
     "socket.io": "^1.1.0"
