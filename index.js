@@ -12,9 +12,13 @@ var numUsers = 0;
 var redis = require ("redis");
 var client = redis.createClient();
 
+// cryptography for password hashing
+var bcrypt = require('bcrypt');
+
 // reset current numbers of users and list of chatters when the chat app is started
 var clear = client.set('userCount', 0);
 var clear = client.del('chatters');
+var clear = client.setnx('my_new_user', 1000);
 
 // deal with routing
 app.get('/', function(req, res){
@@ -26,33 +30,27 @@ app.use("/assets", express.static(__dirname + '/assets'));
 // socket.io messages to and from users
 
 io.on('connection', function(socket){
-	client.setnx('userId', 1000);
-
+	
 	socket.on('join', function(name){
-		client.incr('userId');
+		socket.username = name;
+
 		client.incr('userCount');
 		client.get('userCount', function(err, reply){
 			console.log("counting" + reply);
 		});
-		socket.username = name;
-		var userId = client.get('userId', function(err, reply){
-			var users = client.hset('users', reply, name);
-			//send list of currently connected users
-			client.hget('users', reply, function(err, name){
-				client.sadd('chatters', name, function(){
-					client.smembers('chatters', function(err,data){
-						io.sockets.emit('chatters', data);
-					}); // emit current list of chatters to entire connected group
-				}); // end of adding new user to currently connected users
-			});  
 
-			// send last 15 messages when somebody connects
-			client.lrange('message_list', -14, -1, function(err, reply){
-				for(i = 0; i < reply.length; i ++) {
-					socket.emit('chat message', reply[i]);
-				}	
-			}); // end of list of the last 15 messages
-		}); // end of retrieving 'userId'
+		client.sadd('chatters', name, function(){
+			client.smembers('chatters', function(err,data){
+				io.sockets.emit('chatters', data);
+			}); // emit current list of chatters to entire connected group
+		});
+
+		// send last 15 messages when somebody connects
+		client.lrange('message_list', -14, -1, function(err, reply){
+			for(i = 0; i < reply.length; i ++) {
+				socket.emit('chat message', reply[i]);
+			}	
+		}); // end of list of the last 15 messages
 
 		// welcome new user and emit message that they have joined to other users
 		socket.emit('chat message', "Welcome to Friendly Chat, " + name + "!");
@@ -90,7 +88,14 @@ io.on('connection', function(socket){
 					var hashName = "user:" + reply;
 					client.set(name, reply); //now we can look up by username
 					client.hmset(hashName, "name", name); // and we can then look up username:Id
-					client.hmset(hashName, "password", password);
+					// now we're going to hash the password... 
+					bcrypt.genSalt(10, function(err, salt){
+//						client.hmset(hashName, "salt", salt);
+						bcrypt.hash(password, salt, function(err, hash){
+							client.hmset(hashName, "hash", hash);
+						});
+					});
+//					client.hmset(hashName, "password", password);
 					client.incr("my_new_user");
 				});
 				console.log("hi " + name);
@@ -111,15 +116,18 @@ io.on('connection', function(socket){
 				client.get(name, function(error, reply){
 					hashName = "user:" + reply;
 					console.log("Looking in " + hashName);
-					client.hget(hashName, "password", function(error, reply){
+					client.hget(hashName, "hash", function(error, reply){
 						console.log("password is " + password);
 						console.log("returned is " + reply);
-						if(reply === password){
-							socket.emit('login-message', name, true); // success!
-						} else {
-							var content = "Login unsuccessful."
-							socket.emit('login-message', name, false, content); // if the password is wrong
-						}
+						bcrypt.compare(password, reply, function(err, res) {
+	 						if(res){
+								socket.emit('login-message', name, true); // success!
+							} else {
+								var content = "Login unsuccessful."
+								socket.emit('login-message', name, false, content); // if the password is wrong
+							}
+						});
+
 					}); // end of looking up password
 				}); // end of looking up username
 			} // end of if structure for whether the username exists
