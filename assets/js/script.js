@@ -22,10 +22,23 @@ function validateMessage(msg) {
 	} else{
 		if (msg[0] != '/'){
 			return true;
-		} else { 
+		} else if(msg.substring(0,3) === '/w ') {
+			msg = msg.substring(3);
+			alert("Whisper!" + msg);
+			return true;
+		} else {
 			alert('Command not available');
 			return false;
 		}
+	}
+}
+
+function sendChoice(clicked_id){
+    var msg = prompt("Private message to " + clicked_id);
+    if(msg != ""){
+    	socket.emit('private message', clicked_id, msg);
+	} else {
+		alert("please type a message");
 	}
 }
 
@@ -98,7 +111,27 @@ socket.on('user disconnection', function(name){
 // updates the current list of participants
 socket.on('chatters', function(chatters){
 	document.getElementById("chatlist").textContent = "Currently here: ";
-	for (i = 0; i <= chatters.length; i++) {
-		$('#chatlist').append($('<p>').text(chatters[i]));
+
+	for (i = 0; i < chatters.length; i++) {
+		var element = document.createElement("div");
+		element.id = chatters[i];
+
+		if(chatters[i] != localName){
+// make names clickable to send private messages
+			element.onclick = function() {
+	        	sendChoice(this.id);
+	    	};
+	    	element.onmouseover = function(){
+	    		$(this).css("color", "black");
+			};
+
+	    	element.onmouseleave = function(){
+	    		$(this).css("color", "#fafafa");
+			};
+		}
+    	
+    	element.innerHTML = chatters[i];
+
+		$('#chatlist').append(element);
 	}
 });

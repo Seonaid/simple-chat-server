@@ -6,6 +6,7 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var numUsers = 0;
+var users = [];
 
 // redis used as data storage
 
@@ -33,6 +34,9 @@ io.on('connection', function(socket){
 	
 	socket.on('join', function(name){
 		socket.username = name;
+		users[name] = socket.id;
+
+		console.log(users);
 
 		client.incr('userCount');
 		client.get('userCount', function(err, reply){
@@ -75,6 +79,12 @@ io.on('connection', function(socket){
 		client.rpush("message_list", msg);
 		client.expire("message_list", 3600); // entire list will disappear 1 hour after the conversation is done.
 		io.emit('chat message', msg);
+	});
+
+	socket.on('private message', function(to, msg){
+		console.log("Message from " + socket.username);
+		console.log("going to" + users[to]);
+		io.to(users[to]).emit('chat message', "Private message from " + socket.username + ": " + msg);
 	});
 
 	socket.on('newUser', function(name, password){
